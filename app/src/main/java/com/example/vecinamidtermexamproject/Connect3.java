@@ -2,6 +2,7 @@ package com.example.vecinamidtermexamproject;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -11,19 +12,22 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 public class Connect3 extends AppCompatActivity {
 
     Button btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btn10,
             btn11, btn12, btn13, btn14, btn15, btn16, btn17, btn18, btn19,
-            btn20, btn21, btn22, btn23, btn24, btn25;
+            btn20, btn21, btn22, btn23, btn24, btn25, btn26, btnRestart;
 
     TextView text;
 
     int i1 = 0, i2 = 0, i3 = 0, i4 = 0, i5 = 0;
 
-    ArrayList<Boolean> col1, col2, col3, col4, col5;
+    boolean turn = false;
+
+    int[][] connectArray;
+
+    boolean gameover = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,32 +61,21 @@ public class Connect3 extends AppCompatActivity {
         btn23 = (Button) findViewById(R.id.button23);
         btn24 = (Button) findViewById(R.id.button24);
         btn25 = (Button) findViewById(R.id.button25);
+        btn26 = (Button) findViewById(R.id.button26);
+        btnRestart = (Button) findViewById(R.id.btnReset);
 
-        col1 = new ArrayList<>();
-        for (int i = 0; i < 25; i++) {
-            col1.add(false);
+        text = (TextView) findViewById(R.id.textView7);
+
+        connectArray = new int[5][5];
+
+        //Initializing all elements in the 2D array to 0
+        for(int i = 0; i < 5; i++) {
+            for(int j = 0; j < 5; j++) {
+                connectArray[i][j] = 0;
+            }
         }
 
-        col2 = new ArrayList<>();
-        for (int i = 0; i < 25; i++) {
-            col2.add(false);
-        }
-
-        col3 = new ArrayList<>();
-        for (int i = 0; i < 25; i++) {
-            col3.add(false);
-        }
-
-        col4 = new ArrayList<>();
-        for (int i = 0; i < 25; i++) {
-            col4.add(false);
-        }
-
-        col5 = new ArrayList<>();
-        for (int i = 0; i < 25; i++) {
-            col5.add(false);
-        }
-
+        //Buttons stored in arraylists with their specific columns
         ArrayList<Button> coll1 = new ArrayList<>();
         ArrayList<Button> coll2 = new ArrayList<>();
         ArrayList<Button> coll3 = new ArrayList<>();
@@ -119,47 +112,236 @@ public class Connect3 extends AppCompatActivity {
         coll5.add(btn10);
         coll5.add(btn5);
 
+        List<Button> clicked = new ArrayList<>();
 
-        btn1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        clicked.add(btn1);
+        clicked.add(btn2);
+        clicked.add(btn3);
+        clicked.add(btn4);
+        clicked.add(btn5);
 
-                for (; i1 < 5;) {
-                    if(!col1.get(i1)) {
-                        coll1.get(i1).setBackgroundColor(Color.RED);
-                        i1++;
-                        break;
+        for (Button b : clicked) {
+            b.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (b == btn1) {
+                        if (i1 < 5) {
+                            if(connectArray[i1][0] == 0) {
+                                if (checkTurn()) {
+                                    coll1.get(i1).setBackgroundColor(Color.RED);
+                                    connectArray[i1][0] = 1;
+                                }else {
+                                    coll1.get(i1).setBackgroundColor(Color.BLACK);
+                                    connectArray[i1][0] = 2;
+                                }
+                                i1++;
+                            }
+
+                            if (i1 == 5) {
+                                b.setEnabled(false);
+                            }
+                        }
+                    }
+
+                    if (b == btn2) {
+                        if (i2 < 5) {
+                            if (connectArray[i2][1] == 0) {
+                                if (checkTurn()) {
+                                    coll2.get(i2).setBackgroundColor(Color.RED);
+                                    connectArray[i2][1] = 1;
+                                } else {
+                                    coll2.get(i2).setBackgroundColor(Color.BLACK);
+                                    connectArray[i2][1] = 2;
+                                }
+                                i2++;
+                            }
+
+                            if (i2 == 5) {
+                                b.setEnabled(false);
+                            }
+                        }
+                    }
+
+                    if (b == btn3) {
+                        if (i3 < 5) {
+                            if (connectArray[i3][2] == 0) {
+                                if (checkTurn()) {
+                                    coll3.get(i3).setBackgroundColor(Color.RED);
+                                    connectArray[i3][2] = 1;
+                                } else {
+                                    coll3.get(i3).setBackgroundColor(Color.BLACK);
+                                    connectArray[i3][2] = 2;
+                                }
+                                i3++;
+                            }
+
+                            if (i3 == 5) {
+                                b.setEnabled(false);
+                            }
+                        }
+                    }
+
+                    if (b == btn4) {
+                        if (i4 < 5) {
+                            if (connectArray[i4][3] == 0) {
+                                if (checkTurn()) {
+                                    coll4.get(i4).setBackgroundColor(Color.RED);
+                                    connectArray[i4][3] = 1;
+                                } else {
+                                    coll4.get(i4).setBackgroundColor(Color.BLACK);
+                                    connectArray[i4][3] = 2;
+                                }
+                                i4++;
+                            }
+
+                            if (i4 == 5) {
+                                b.setEnabled(false);
+                            }
+                        }
+                    }
+
+                    if (b == btn5) {
+                        if (i5 < 5) {
+                            if (connectArray[i5][4] == 0) {
+                                if (checkTurn()) {
+                                    coll5.get(i5).setBackgroundColor(Color.RED);
+                                    connectArray[i5][4] = 1;
+                                } else {
+                                    coll5.get(i5).setBackgroundColor(Color.BLACK);
+                                    connectArray[i5][4] = 2;
+                                }
+                                i5++;
+                            }
+
+                            if (i5 == 5) {
+                                b.setEnabled(false);
+                            }
+                        }
+                    }
+                    if(checker(connectArray)) {
+                        if (turn) {
+                            text.setText("Player 1 Has Won!");
+                        }else {
+                            text.setText("Player 2 Has Won!");
+                        }
+                        for (Button bb : clicked) {
+                            bb.setEnabled(false);
+                        }
+
+                        gameover = true;
+                    }
+
+                    if (!gameover) {
+                        if (turn) {
+                            text.setText("Player 2");
+                            btn26.setBackgroundColor(Color.BLACK);
+                        } else {
+                            text.setText("Player 1");
+                            btn26.setBackgroundColor(Color.RED);
+                        }
                     }
                 }
-            }
-        });
-
-        btn2.setOnClickListener(new View.OnClickListener() {
+            });
+        }
+        //Restarts the game
+        btnRestart.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
+                gameover = false;
 
+                for (Button b : clicked) {
+                    b.setEnabled(true);
+                }
+
+                for (int i = 0; i < 5; i++) {
+                    for (int j = 0; j < 5; j++) {
+                        connectArray[i][j] = 0;
+                    }
+                }
+
+                text.setText("Player 1");
+                btn26.setBackgroundColor(Color.RED);
+
+                for (Button b1 : coll1) {
+                    b1.setBackgroundColor(Color.WHITE);
+                }
+
+                for (Button b2 : coll2) {
+                    b2.setBackgroundColor(Color.WHITE);
+                }
+
+                for (Button b3 : coll3) {
+                    b3.setBackgroundColor(Color.WHITE);
+                }
+
+                for (Button b4 : coll4) {
+                    b4.setBackgroundColor(Color.WHITE);
+                }
+
+                for (Button b5 : coll5) {
+                    b5.setBackgroundColor(Color.WHITE);
+                }
+
+                i1 = 0;
+                i2 = 0;
+                i3 = 0;
+                i4 = 0;
+                i5 = 0;
             }
         });
+    }
+    // Rotate turns and returns a boolean value
+    private boolean checkTurn() {
+        if (!turn) {
+            turn = true;
+            return true;
+        }else {
+            turn = false;
+            return false;
+        }
+    }
 
-        btn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
+    public boolean checker(int[][] array) {
+        //Checks horizontally
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (array[i][j] == array[i][j + 1] && array[i][j] == array[i][j + 2]
+                        && array[i][j] != 0 && array[i][j + 1] != 0 && array[i][j + 2] != 0) {
+                    return true;
+                }
             }
-        });
+        }
 
-        btn4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
+        //Checks vertically
+        for (int j = 0; j < 5; j++) {
+            for (int i = 0; i < 3; i++) {
+                if (array[i][j] == array[i + 1][j] && array[i][j] == array[i + 2][j]
+                        && array[i][j] != 0 && array[i + 1][j] != 0 && array[i + 2][j] != 0) {
+                    return true;
+                }
             }
-        });
+        }
 
-        btn5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
+        //Checks Diagonally from bottomright to topleft
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (array[i][j] == array[i + 1][j + 1] && array[i][j] == array[i + 2][j + 2]
+                        && array[i][j] != 0 && array[i + 1][j + 1] != 0 && array[i + 2][j + 2] != 0) {
+                    return true;
+                }
             }
-        });
+        }
+
+        //Checks Diagonally from topright to bottomleft
+        for (int i = 4; i >= 2; i--) {
+            for (int j = 0; j < 3; j++) {
+                if (array[i][j] == array[i - 1][j + 1] && array[i][j] == array[i - 2][j + 2]
+                        && array[i][j] != 0 && array[i - 1][j + 1] != 0 && array[i - 2][j + 2] != 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
